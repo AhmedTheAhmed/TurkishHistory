@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turkish History Practice</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .choice-btn {
+            transition: all 0.2s;
+        }
+        .choice-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .correct-anim {
+            background-color: #10b981 !important; /* Green-500 */
+            color: white !important;
+            border-color: #10b981 !important;
+        }
+        .wrong-anim {
+            background-color: #ef4444 !important; /* Red-500 */
+            color: white !important;
+            border-color: #ef4444 !important;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4 text-gray-800">
+
+    <!-- Main Container -->
+    <div class="w-full max-w-2xl bg-white rounded-2xl shadow-xl overflow-hidden min-h-[500px] flex flex-col relative">
+        
+        <!-- Header -->
+        <div class="bg-red-600 p-6 text-white text-center relative">
+            <div class="absolute top-4 left-4 opacity-20 text-4xl">
+                <i class="fas fa-landmark"></i>
+            </div>
+            <h1 class="text-2xl font-bold tracking-wide">Turkish History Practice</h1>
+            <p class="text-red-100 text-sm mt-1">Midterm & Final Review</p>
+            
+            <!-- Progress Bar (Only visible in Quiz) -->
+            <div id="progress-container" class="hidden mt-4 h-2 bg-red-800 rounded-full overflow-hidden">
+                <div id="progress-bar" class="h-full bg-white transition-all duration-300" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="flex-grow p-6 flex flex-col justify-center relative">
+
+            <!-- VIEW 1: Menu -->
+            <div id="menu-view" class="fade-in space-y-6 text-center">
+                <h2 class="text-xl font-semibold text-gray-700">Select a Topic to Start</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <button onclick="startQuiz('midterm')" class="choice-btn group p-8 rounded-xl border-2 border-red-100 hover:border-red-500 bg-red-50 hover:bg-red-500 transition-colors cursor-pointer flex flex-col items-center justify-center gap-3">
+                        <i class="fas fa-book-open text-3xl text-red-500 group-hover:text-white"></i>
+                        <span class="text-lg font-bold text-red-700 group-hover:text-white">Midterm</span>
+                        <span class="text-xs text-red-400 group-hover:text-red-100">History & Origins</span>
+                    </button>
+                    <button onclick="startQuiz('final')" class="choice-btn group p-8 rounded-xl border-2 border-red-100 hover:border-red-500 bg-red-50 hover:bg-red-500 transition-colors cursor-pointer flex flex-col items-center justify-center gap-3">
+                        <i class="fas fa-flag text-3xl text-red-500 group-hover:text-white"></i>
+                        <span class="text-lg font-bold text-red-700 group-hover:text-white">Final</span>
+                        <span class="text-xs text-red-400 group-hover:text-red-100">Republic Era</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- VIEW 2: Quiz -->
+            <div id="quiz-view" class="hidden fade-in flex-col h-full">
+                <div class="flex justify-between items-center mb-4 text-sm text-gray-500 font-medium">
+                    <span id="question-counter">Question 1/20</span>
+                    <div class="flex gap-3">
+                        <span class="text-green-600"><i class="fas fa-check mr-1"></i><span id="score-correct">0</span></span>
+                        <span class="text-red-500"><i class="fas fa-times mr-1"></i><span id="score-wrong">0</span></span>
+                    </div>
+                </div>
+
+                <div class="flex-grow flex flex-col justify-center">
+                    <h3 id="question-text" class="text-lg md:text-xl font-semibold text-gray-800 mb-6 leading-relaxed">
+                        <!-- Question goes here -->
+                    </h3>
+
+                    <div id="choices-container" class="space-y-3">
+                        <!-- Buttons generated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 3: Results -->
+            <div id="results-view" class="hidden fade-in text-center py-8">
+                <div class="mb-6">
+                    <div class="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl text-red-600">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800">Quiz Completed!</h2>
+                    <p class="text-gray-500">Here is how you performed</p>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4 mb-8 max-w-xs mx-auto">
+                    <div class="bg-green-50 p-3 rounded-lg border border-green-200">
+                        <div class="text-2xl font-bold text-green-600" id="final-correct">0</div>
+                        <div class="text-xs text-green-800 uppercase font-bold">Correct</div>
+                    </div>
+                    <div class="bg-red-50 p-3 rounded-lg border border-red-200">
+                        <div class="text-2xl font-bold text-red-600" id="final-wrong">0</div>
+                        <div class="text-xs text-red-800 uppercase font-bold">Wrong</div>
+                    </div>
+                    <div class="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                        <div class="text-2xl font-bold text-blue-600" id="final-percentage">0%</div>
+                        <div class="text-xs text-blue-800 uppercase font-bold">Score</div>
+                    </div>
+                </div>
+
+                <button onclick="location.reload()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition transform hover:scale-105">
+                    <i class="fas fa-redo mr-2"></i> Back to Menu
+                </button>
+            </div>
+
+        </div>
+        
+        <!-- Footer -->
+        <div class="bg-gray-50 p-3 text-center text-xs text-gray-400 border-t">
+            Turkish History Study Tool
+        </div>
+    </div>
+
+    <script>
+        // --- DATA SECTION ---
+        // Embedded JSON data as requested. In a real app with a backend, you might fetch this.
+        const rawData = [
+          {
+            "category": "midterm",
+            "questions": [
+              { "q": "Which of the following was not a cause of stagnation of the Ottoman Empire?", "a": "Well educated sultan", "c": ["Corruption in administration", "Economic decline", "Military defeats"] },
+              { "q": "From what ancient civilizations did the people in Italy get the idea for humanism?", "a": "The Roman and Greeks", "c": ["The Egyptians and Persians", "The Chinese and Indians", "The Mesopotamians and Hebrews"] },
+              { "q": "Which of the following cannot be shown among the problems challenging with the Ottoman Empire in the 19th century?", "a": "Canadian war", "c": ["Nationalist movements", "Economic crises", "Foreign interventions"] },
+              { "q": "Which explorer discovered a trade route around the southern tip of Africa to India?", "a": "Vasco da Gama", "c": ["Christopher Columbus", "Ferdinand Magellan", "Marco Polo"] },
+              { "q": "Which of the following countries did not fight with the Ottoman Empire in the 16th century?", "a": "England", "c": ["Austria", "Russia", "Persia"] },
+              { "q": "In the Ottoman Empire, while 55 grand viziers were appointed between the years of 1300 and 1600, 61 grand viziers were appointed in the 17th century. What does this indicate?", "a": "Instability in the empire administration", "c": ["Strong central government", "Economic prosperity", "Military success"] },
+              { "q": "What war was the result of the Reformation?", "a": "The Thirty Year War", "c": ["The Hundred Years War", "The Seven Years War", "The Napoleonic Wars"] },
+              { "q": "Which of the following is an indication that the Ottoman Empire closely followed the developments in the West during the 18th century?", "a": "Appointment of ambassador of western capitals", "c": ["Isolation from Europe", "Rejection of western technology", "Preservation of traditional systems only"] },
+              { "q": "Which country sponsored the expedition of Christopher Columbus where he discovered the Americas?", "a": "Spain", "c": ["Portugal", "England", "France"] },
+              { "q": "What practice allowed people to gain forgiveness by giving the Catholic Church money?", "a": "Paying indulgence", "c": ["Tithing", "Confession", "Pilgrimage"] },
+              { "q": "Which churchman began to question the teachings of the Catholic Church in 1517?", "a": "Martin Luther", "c": ["John Calvin", "Henry VIII", "Ignatius of Loyola"] },
+              { "q": "Which of the following is not a result of internal riots happened in the 17th century in the Ottoman Empire?", "a": "Great achievement in the battles", "c": ["Weakening of central authority", "Economic instability", "Social unrest"] },
+              { "q": "What were most of the explorers looking for on their expeditions?", "a": "New trading routes", "c": ["Religious conversion", "Scientific discovery", "Military conquest"] },
+              { "q": "Which of following is the external factor that prevent economic development of the Ottoman Empire in the 17th century?", "a": "Finding new trade routes after geographical discoveries", "c": ["Internal corruption", "Inefficient taxation", "Agricultural decline"] },
+              { "q": "Which Ottoman Sultan carried out Nizam-i Cedid Reforms?", "a": "The third Selim", "c": ["The second Mahmud", "The first Abdulhamid", "The second Mustafa"] },
+              { "q": "In which sultan's period was the Fez used as the official head-dress?", "a": "Second Mahmud", "c": ["First Abdulhamid", "Third Selim", "Second Abdulhamid"] },
+              { "q": "What is the name of the army that came to Istanbul from Thessaloniki in the 31 Mart Incident and suppressed the Rebels?", "a": "Army of action", "c": ["Army of liberation", "Army of reform", "Army of revolution"] },
+              { "q": "Which of the following is one of the developments during reign of Mahmut II?", "a": "The abolition of janissary crops", "c": ["Declaration of Tanzimat", "Establishment of parliament", "Abolition of caliphate"] },
+              { "q": "What is the historical event that caused danger bells to ring for the empires by strengthening the nationalist movement?", "a": "The French Revolution", "c": ["The Industrial Revolution", "The Renaissance", "The Reformation"] },
+              { "q": "Which of the following was the main form of governance of Medieval Europe?", "a": "Feudality", "c": ["Republicanism", "Democracy", "Absolute monarchy"] },
+              { "q": "Which of the following was one of the results of the French Revolution?", "a": "Nationalist movement emerged", "c": ["Industrialization began", "Colonialism ended", "Religious unity achieved"] },
+              { "q": "Which of the following was not one of the reforms made during the reign of Mahmut II?", "a": "The first print house was established", "c": ["Abolition of janissary corps", "Establishment of new army", "Administrative reorganization"] },
+              { "q": "What is the name of the first official newspaper started to publish during the period of Mahmut II?", "a": "Takvim-i Vekayi", "c": ["Ceride-i Havadis", "Tercüman-ı Ahval", "Sabah"] },
+              { "q": "Which of the following treaties caused the Ottoman Empire's reputation in Europe to be shaken?", "a": "Karlowitz", "c": ["Zsitvatorok", "Istanbul", "Qasr-e Shirin"] },
+              { "q": "Which state, quickly grew stronger and acquired large colonies, was given the title of 'the empire on which the sun never sets'?", "a": "The British Empire", "c": ["France", "The Ottoman Empire", "Germany"] },
+              { "q": "Which of the following empires territorial integrity was threatened by Russia's policy of reaching the warm seas?", "a": "The Ottoman Empire", "c": ["Germany", "France", "USA"] },
+              { "q": "Which of the above concepts is mismatched?", "a": "Dogmatism: It is the idea that removes the barriers to reason, science and free thought", "c": ["The indulgence: It is a document given by the Church and away to reduce the amount of punishment one has to undergo for sins in the Medieval Europe", "Excommunication: It means putting a specific individual or group out of communion", "Inquisitions: These are the religious courts affiliated with the Catholic church"] },
+              { "q": "Which of the following is not one of the results of the Renaissance?", "a": "Overthrowing of feudalism", "c": ["The destruction of scholastic thought", "Beginning of Reform movements", "The Birth of Free Thought Environment"] },
+              { "q": "In which Sultan period the fratricide system was abolished?", "a": "I. Ahmet", "c": ["I. Osman", "I. Mustafa", "I. Süleyman"] },
+              { "q": "Which of the following is not included among the developments during the Tulip Period in the Ottoman Empire?", "a": "Abolishing of the Janissary Corps", "c": ["Revival of Cultural Life", "Opening of new libraries", "Application of smallpox vaccine for the first time"] },
+              { "q": "Which of the following is the main reason why Britain and Russia, reacting to Napoleon's invasion of Egypt in 1798, acted together with the Ottoman Empire?", "a": "Preventing France from settling in the Eastern Mediterranean", "c": ["To make the Ottoman Empire prevail", "Getting new colonies", "Preventing the Ottoman Navy from being defeated"] },
+              { "q": "In the second half of the 19th century, Italy and Germany completed their political unity. This situation caused:", "a": "The change in the balance of power in Europe and Formation of Triple Alliance and Triple Entente blocks", "c": ["The emergence of the Straits problem", "The end of colonialism", "The weakening of nationalism"] },
+              { "q": "The policies followed by which of the following states were primarily effective in the emergence of the Armenian Question?", "a": "Russia-England", "c": ["Germany-Italy", "Austria-Hungary", "USA-France"] },
+              { "q": "Which of the following developments in Europe caused the Ottoman Empire to lose land?", "a": "French Revolution", "c": ["Geographical Discoveries", "Renaissance", "Reform movements"] },
+              { "q": "The Ottoman Empire's desire to prevent the minority problem from coming to the agenda in the conference to be held in London was influential in the announcement of the Tanzimat Edict. This indicates that the Ottoman Empire was concerned about:", "a": "Interference in internal affairs", "c": ["Weakening of its military power", "Being politically alone", "The deterioration of its economy"] },
+              { "q": "What can be said as a result of Renaissance and Industrial Revolution developments?", "a": "The Ottoman Empire falls behind Europe scientifically and economically", "c": ["The strengthening of the Ottoman Empire", "Administration change in the Ottoman Empire", "Considering the Ottoman Empire as a European State"] },
+              { "q": "What would the reforms made in the reign of Selim III generally be called?", "a": "The New Order", "c": ["Constitutionalism", "The Reorganization", "The Reform"] },
+              { "q": "Which of the following is the most important improvement that the Second Constitutional Era brought to Turkish history of democracy?", "a": "Establishing political parties", "c": ["Gaining effectiveness of Turkism movement", "Coming into force of the Constitution", "Acceleration of the reform activities"] },
+              { "q": "Which of the following articles in the Constitution was effective in achieving a democratic structure of the Ottoman Empire?", "a": "Members of the Parliamentary Assembly will be elected by the people every four years", "c": ["The government is responsible to the Sultan", "The authority to open and close the assembly belongs to the Sultan", "The sultan elects the members of the Upper House"] },
+              { "q": "In which of the following countries did the Industrial Revolution begin?", "a": "England", "c": ["Italy", "France", "Russia"] },
+              { "q": "Which of the followings can be related in order to ensure the participation of all communities under the Ottoman rule and to prevent the disintegration of the Empire?", "a": "Declaration of the First Constitutional Monarchy", "c": ["The Outbreak of the 31 March Incident", "Opening of the Military College", "Signature of Charter of Alliance"] },
+              { "q": "Which of the following is not one of the reforms introduced in the Second Constitutional Period?", "a": "Women's membership in political parties", "c": ["Establishment of political parties", "Passing the legislative power to the parliament", "The decrease of the Sultan's influence on the executive power"] },
+              { "q": "Which of the following is not one of the political parties established during the Ottoman period?", "a": "Republican People's Party", "c": ["Party of Union and Progress", "Freedom and Accord Party", "Ottoman Liberty Party"] },
+              { "q": "Which of the following is an event to change the Constitutional Monarchy order?", "a": "31 March Incident", "c": ["Kabakçı Mustafa Rebellion", "Patrona Halil Rebellion", "Celali Rebellion"] },
+              { "q": "With which of the following, military service was considered as homeland service for the first time?", "a": "Edict of Reorganization", "c": ["I. Constitutional Monarchy", "Edict of Reform", "Charter of Alliance"] },
+              { "q": "In which sultan's period was the Tanzimat and Islahat Edicts declared?", "a": "Abdülmecit", "c": ["Abdülaziz", "II. Abdülhamit", "II. Mahmut"] },
+              { "q": "Which of the following is not a Western style school in the Ottoman Empire?", "a": "Palace School", "c": ["University", "Naval Academy", "Military Academy"] },
+              { "q": "Which of the following treaties had an effect on the domination of foreign goods in the Ottoman markets and the economic dependence of the state on foreign countries?", "a": "Treaty of Balta Liman", "c": ["Treaty of Adrianople", "Treaty of Paris", "Treaty of Berlin"] },
+              { "q": "The Ottoman Empire borrowed foreign debt during which of the following events for the first time?", "a": "Crimean War", "c": ["Abolition of the Janissary Corps", "Signing of the Berlin Treaty", "Greece's Independence"] },
+              { "q": "Which of the following was established with the Muharrem Decree in the Ottoman Empire?", "a": "Ottoman Public Debt Administration", "c": ["The Assembly", "Janissary Corps", "Military Academy"] },
+              { "q": "In which of these time periods was World War 1 fought?", "a": "1914-1918", "c": ["1912-1914", "1918-1922", "1939-1945"] },
+              { "q": "Germany, with its allies Austria-Hungary and the Ottoman Empire made up what was known as the _____.", "a": "Central Powers", "c": ["Aggressive powers", "Belligerent powers", "Axis powers"] },
+              { "q": "Which of the following had brought the end of the Ottoman Empire?", "a": "World War I", "c": ["Russian Revolution", "Turkish Revolution", "World War II"] },
+              { "q": "Which of the following represents Ataturk opinion about World War I?", "a": "Ottoman must have remained absolutely outside the war", "c": ["Ottoman Empire must have cooperated closely with the Germans", "Ottoman Empire must have cooperated closely with the English Forces", "Ottoman Empire must have entered to war alone"] },
+              { "q": "An important result of the First World War was _____.", "a": "A defeated Ottoman", "c": ["A victorious Germany", "A defeated France", "A revolution in Bulgaria"] },
+              { "q": "What are the two groupings of states which were emerged after the great recession of 1929?", "a": "Allied powers/central powers", "c": ["Great states/non-state actors", "Republicans/democrats", "Revisionists/anti-revisionists"] }
+            ]
+          },
+          {
+            "category": "final",
+            "questions": [
+              { "q": "Which one CANNOT be one of the subject headings in the directive given to the delegation heading to Lausanne?", "a": "Sultanate Issue", "c": ["Capitulations", "Minorities", "Ottoman Debts"] },
+              { "q": "Which of the following CANNOT be evaluated as a historical significance of the Mudanya Armistice?", "a": "Greek soldiers had to leave Izmir after the agreement", "c": ["It documents the military success of the National Struggle", "Eastern Thrace was regained without the need for war", "England recognized the Turkish state by the treaty with the GNAT"] },
+              { "q": "Which event is described in the passage about facing the British and a possible new war after liberating Izmir?", "a": "Çanakkale Crisis", "c": ["Minority Issue", "Patrikane Issue", "Hatay Issue"] },
+              { "q": "Which is NOT one of the developments leading to the abolition of the Sultanate?", "a": "Sultan Vahdettin seeking asylum with the British", "c": ["England inviting the Istanbul government to Lausanne", "Istanbul attempting to send a representative", "Istanbul claiming authority to appoint reps"] },
+              { "q": "Which is NOT a development preceding the Lausanne Conference?", "a": "Abolition of the Caliphate", "c": ["Signing of the Mudanya Armistice", "Abolition of the Sultanate", "Resolution of the location issue"] },
+              { "q": "Which of the following is a matter discussed only in the Treaty of Lausanne, not in the Treaty of Sèvres?", "a": "Population Exchange", "c": ["Capitulations", "Independent Kurdistan", "Greater Armenia"] },
+              { "q": "Which was an unresolved issue left for later at Lausanne?", "a": "Mosul Issue", "c": ["Thrace Border", "Foreign Schools Issue", "Minority Question"] },
+              { "q": "Which CANNOT be considered a historical significance of the Treaty of Lausanne?", "a": "Entrusting control of straits to international commission", "c": ["Preventing the division of Anatolia", "Resolution of long-standing issues", "End of military pressure via border definition"] },
+              { "q": "Which is NOT accurate about the resolution of Ottoman debts?", "a": "All debts will be paid in Turkish Lira", "c": ["Paris-based commission managed payments", "Debts were shared with former Ottoman states", "Payment plan revised in 1933"] },
+              { "q": "Which statement about the Mosul issue is INCORRECT?", "a": "League gave Mosul to England", "c": ["Not resolved in Lausanne", "Turkey and Britain held talks", "League of Nations was involved"] },
+              { "q": "Which of the following cannot be considered one of the revolutions made in the political field?", "a": "Acceptance of the Surname Law", "c": ["Selection of Ankara as the capital", "Abolition of the Caliphate", "Declaration of the Republic"] },
+              { "q": "In line with this aim, which of the following was the first revolution made by Mustafa Kemal?", "a": "Abolishing the Sultanate", "c": ["Accepting the Latin alphabet", "Declaring the Republic", "Transitioning to a multi-party system"] },
+              { "q": "Which of the following is not one of the reasons requiring the declaration of the Republic?", "a": "Mustafa Kemal desired to become the President", "c": ["The form of government was not determined", "There was no head of state", "The Caliph portrayed himself as the head of state"] },
+              { "q": "With the selection of Ankara as the capital of the new Turkish state, which message was intended to be conveyed domestically and internationally?", "a": "That there would be no return to the Sultanate rule and all authorities were centralized in Ankara, the heart of Turkey", "c": ["That it has better transportation facilities than Istanbul", "That Ankara is a sacred city for Turks", "That the most fertile lands of Anatolia are in Ankara"] },
+              { "q": "Which one of the following is not one of the amendments made in the 1924 constitution later?", "a": "Transfer of judicial authority to Independence Courts", "c": ["Removal of the article stating that the religion of the state is Islam", "Inclusion of the Six Arrows into the constitution", "Granting women the right to vote and be elected"] },
+              { "q": "Which of the following is not determined by the Constitution?", "a": "How universities will be administered", "c": ["To whom sovereignty belongs and how it will be exercised", "What form of government the state has and what its powers are", "What rights, freedoms, and duties citizens have and how freedoms will be exercised"] },
+              { "q": "What message should be inferred from Emir Ali's request to preserve the Caliphate?", "a": "The potential harmful use of the Caliphate by foreign powers", "c": ["Britain's willingness to take on the protection of Islam", "India's aspiration to become the leader of the world's Muslims", "The desire to appoint the Caliph as the President"] },
+              { "q": "Which of the following items is not a characteristic of the 1924 Constitution?", "a": "Parliamentary elections are held every 4 years", "c": ["It is regulated to facilitate the transition to a parliamentary system", "The Parliamentary Government System is fundamental", "Soft separation of powers is provided"] },
+              { "q": "Which of the following accurately explains the meaning of 'Ataturk'?", "a": "The Father Of The Turks", "c": ["The Great Leader", "The Conqueror", "The Founder"] },
+              { "q": "In 1923, Mustafa Kemal Ataturk turned Turkey into?", "a": "A secular republic", "c": ["A constitutional monarchy", "An Islamic state", "A communist state"] },
+              { "q": "The Turkish Grand National Assembly (TBMM) convened for the first time on 23 April 1920 in?", "a": "Ankara", "c": ["Istanbul", "Izmir", "Sivas"] },
+              { "q": "What was the main purpose of Ataturk during the Turkish national struggle?", "a": "Protecting the Turkish land", "c": ["Becoming a sultan", "Avoiding war", "Occupying Greece"] },
+              { "q": "What was Ataturk's motto at the beginning of the Turkish national Struggle?", "a": "Freedom or death", "c": ["Victory or defeat", "Unity or division", "Peace or war"] },
+              { "q": "Which of the following was the first president of Republic of Turkey?", "a": "Mustafa kemal ataturk", "c": ["Ismet Inonu", "Kazim Karabekir", "Fevzi Cakmak"] },
+              { "q": "Which of the following is not a battle front that Ataturk experienced war while he was a captain and major?", "a": "Scandinavia", "c": ["North Africa", "Syria", "Balkans"] },
+              { "q": "Which of the following were the fronts of Anatolia during the national struggle?", "a": "East, south and west", "c": ["North, south and center", "East, west and north", "South, center and north"] },
+              { "q": "During the WWI the British war council decided to capture _____ by first opening a front of _____.", "a": "Istanbul/The dardanelles", "c": ["Ankara/Black Sea", "Izmir/Anatolia", "Thrace/Marmara"] },
+              { "q": "What was Ataturk's motto when the Turkish Grand National Assembly was established?", "a": "The sovereignty unconditionally belongs to the nation", "c": ["Unity and progress", "Freedom and independence", "Peace and prosperity"] },
+              { "q": "One similarity in the breakup of the Ottoman Empire and creation of the Turkish Republic was that both was influenced by _____.", "a": "Nationalism", "c": ["Imperialism", "Theocracy", "Communism"] },
+              { "q": "Mustafa Kemal Ataturk changed the Turkish government by _____.", "a": "Introducing democratic reforms", "c": ["Establishing absolute monarchy", "Creating military dictatorship", "Implementing communist system"] },
+              { "q": "What was Ataturk's economic Policy?", "a": "Mixed economy", "c": ["Pure capitalism", "Socialist economy", "Traditional economy"] },
+              { "q": "Which of the following explains accurately the meaning of 'gazi' which is Mustafa Kemal's title?", "a": "War veteran", "c": ["Field marshall", "Perfection", "Good soldier"] },
+              { "q": "Turkish victory at the battle of Sakarya accelerated the recognition of the national Turkish government by other countries. Which of the following is not one of them?", "a": "India", "c": ["Afghanistan", "France", "United Kingdom"] },
+              { "q": "After World War I, the most strategically important focus of British and French colonialism was _____.", "a": "The Middle East", "c": ["North Africa", "The South Pacific", "Eastern Europe"] },
+              { "q": "On 13 August 1921, the Greeks started attack against the Turkish troops to reach _____.", "a": "Ankara", "c": ["Salonika", "Their own land", "The straits"] },
+              { "q": "Which of the following is not embraced by Atatürk?", "a": "Despotism", "c": ["Westernization", "Nationalism", "Secularism"] },
+              { "q": "Which of the following is one of the turning points in Turkish history?", "a": "The battle of Sakarya", "c": ["Franco-Prussian war", "Capture of Adana", "The battle of Sedan"] },
+              { "q": "Which of the following titles is not appropriate for Atatürk?", "a": "Narrow-minded", "c": ["Reformist", "Humanist", "Visionary"] },
+              { "q": "Which action is most closely associated with Atatürk?", "a": "Using western practices to modernize Turkey", "c": ["Establishing the league of nations", "Enforcing Islamic law", "Setting up the substructure of Tanzimat"] },
+              { "q": "In which of these time periods was Turkish War of Independence fought?", "a": "1919-1922", "c": ["1939-1945", "1925-1930", "1914-1918"] },
+              { "q": "On January 30, 1923, the convention concerning the exchange of minorities was signed between Turkey and _____.", "a": "Greece", "c": ["Italy", "France", "The Soviet Union"] },
+              { "q": "Which of the following accurately explains the vision of Atatürk's foreign policy?", "a": "Westernization", "c": ["Isolationism", "Dependency", "Interventionism"] },
+              { "q": "Which of the following triggered the Turkish national struggle?", "a": "Occupation of Izmir on 15 May 1919", "c": ["Resignation of the sultan", "Misgovernment of the British statesmen", "Ratification of the treaty of Sevres"] },
+              { "q": "Which of the following is wrong about where does the name 'Kemal' in 'Mustafa Kemal Ataturk' comes from?", "a": "It is his grandfather's name and he was named after him", "c": ["It means 'perfect'", "It wasn't his given name of birth", "It was given when he was a student"] },
+              { "q": "Which has signed July, only post-war agreement depended mutual negotiations?", "a": "The Treaty of Lausanne", "c": ["The Treaty of Versailles", "Sevres Treaty", "Sadabat Pact"] },
+              { "q": "Which one of the following is one of the leaders of Ataturk time?", "a": "Benito Mussolini", "c": ["George Washington", "Napoleon Bonaparte", "Yaser Arafat"] },
+              { "q": "Which of the following is Atatürk's point of view and rhetoric?", "a": "Peace at home, peace in the world", "c": ["Welcome", "Let's rule the country together", "They will leave as they came"] },
+              { "q": "Which action is more closely related to Atatürk?", "a": "Arranging the Turkish National Struggle", "c": ["Beginning of the Zionist movement", "Starting the Palestine Liberation Organization", "Establishment of the United Nations"] },
+              { "q": "In which of these time periods did Atatürk serve as the President of the Republic of Turkey?", "a": "1923-1938", "c": ["1900-1914", "1939-1945", "1914-1918"] },
+              { "q": "Which of the following represents Ataturk perspective and discourse when he saw the British navy anchoring in Istanbul at the end of the world war 1?", "a": "As they have come, so they shall go!", "c": ["Let's govern the country together", "Welcome", "The only remedy is to put all the available troops under my command"] },
+              { "q": "Which of the following country send military forces to occupy Anatolia and fought with the Turkish nationalist at the Turkish national struggle?", "a": "Great Britain", "c": ["USA", "Afghanistan", "Russia"] },
+              { "q": "Which of the following is the name of the regime in which the sovereignty is not in a person or a group but in the whole society?", "a": "Republic", "c": ["Constitutionalism", "Sultanate", "Monarchy"] },
+              { "q": "The purpose of Ataturk during the Turkish national movement was _____.", "a": "Protecting the Turkish land", "c": ["Becoming a sultan", "Avoiding war", "Defeating Russians"] },
+              { "q": "Which of the following can not be the aim of the Turkish revolution?", "a": "Imperialism",
+                "c": ["Democracy", "Modernity", "Independence"]
+              },
+              { "q": "The war period of the Turkish National Struggle's has come to an end just after _____.", "a": "The final offensive", "c": ["Battle of Inonu", "The WWI", "The battle of Sakarya"] },
+              { "q": "Which of the following statements are consequences of the Lausanne Peace Treaty?", "a": "The independence Turkey was recognized by the Allied Powers and The capitulations were abolished", "c": ["The sultanate was abolished", "The caliphate was abolished", "The republic was declared"] },
+              { "q": "Which of the above have been reintegrated into Turkish territories through the Mudanya Armistice Agreement?", "a": "Eastern Thrace", "c": ["Cyprus", "Aegean Islands", "Mosul"] },
+              { "q": "What event negatively affected Turkey's attempt to include Mosul within its borders?", "a": "Sheikh Said Rebellion", "c": ["Capitulations", "Great Depression", "Free Republic Party"] },
+              { "q": "The first political reform of Ataturk was _____.", "a": "Introducing national will and sovereignty", "c": ["Creating the multi party system", "Changing the unit of currency", "Establishing new schools"] },
+              { "q": "Which of the following are the important contributions of Ataturk?", "a": "Establishing the roots of modern Turkish democracy and Creating the secular political system", "c": ["Starting the World War I", "Establishing absolute monarchy", "Implementing communist system"] },
+              { "q": "With the establishment of the Progressive Republican Party, which of the following assumed the party's leadership?", "a": "Kazim Karabekir Pasha", "c": ["Refet (Bele) Pasha", "Adnan (Advar) Bey", "Ali Fuat (Cebesoy) Pasha"] },
+              { "q": "In order to secularize the governmental system, GNAT accepted a law _____.", "a": "To abolish the Caliphate", "c": ["On the unification of education", "On nationalization of public administration", "To cancel the usage of nicknames"] },
+              { "q": "What is the common characteristic of the events listed: Sheikh Said Rebellion, Assassination attempt on Ataturk in Izmir, Menemen Incident?", "a": "Obstructing the Republic, its revolutions, and its architect Mustafa Kemal Pasha", "c": ["Solely to assassinate Mustafa Kemal Pasha", "Creating unrest within the country", "Solely to restore the caliphate"] },
+              { "q": "Which of the following is not embraced by Ataturk?", "a": "Despotism", "c": ["Secularism", "Nationalism", "Social equality"] },
+              { "q": "In 1923, Mustafa Kemal Ataturk turned Turkey into _____.", "a": "A secular republic", "c": ["A constitutional monarchy", "A communist state", "An Islamic state"] },
+              { "q": "Which of the following can not be the aim of the Turkish revolution?", "a": "Imperialism", "c": ["Secularism", "Democracy", "Independence"] },
+              { "q": "Which action is most closely associated with Ataturk?", "a": "Using Western practices to modernize Turkey", "c": ["Enforcing Islamic law", "Beginning the French Revolution", "Establishing the League of Nations"] },
+              { "q": "During the period when the Lausanne Negotiations were interrupted from February 4 to April 23, 1923, which of the following locations was chosen for the meeting aimed at determining the economic policies of the new Turkish State?", "a": "Izmir", "c": ["Istanbul", "Erzurum", "Sivas"] },
+              { "q": "Which of the following was the source of sovereignty in the Constitutions of 1921 and 1924?", "a": "Nation", "c": ["Turkish Grand National Assembly", "Sultan", "Government"] },
+              { "q": "Which has been signed in 24th July, 1923 was the only post-war agreement which depended on mutual negotiations?", "a": "The Treaty of Lausanne", "c": ["Balkan Pact", "Sevres Treaty", "The Treaty of Versailles"] },
+              { "q": "Which of the following is not one of the states that signed the Mudanya Armistice Agreement?", "a": "Russia", "c": ["Italy", "Greece", "England"] },
+              { "q": "Which action is most closely associated with Ataturk?", "a": "To modernize Turkey", "c": ["Establishing the League of Nations", "Setting up the substructure of Tanzimat", "Enforcing Sharia law"] },
+              { "q": "Which of the following is the chronological order of the developments: Proclamation of the Republic, Abolition of the Sultanate, Abolition of the Caliphate?", "a": "Abolition of the Sultanate, Proclamation of the Republic, Abolition of the Caliphate", "c": ["Proclamation of the Republic, Abolition of the Caliphate, Abolition of the Sultanate", "Abolition of the Caliphate, Abolition of the Sultanate, Proclamation of the Republic", "Proclamation of the Republic, Abolition of the Sultanate, Abolition of the Caliphate"] },
+              { "q": "In which of these time periods Ataturk's reforms were made?", "a": "1920-1930s", "c": ["1930-1940s", "1900-1910s", "1910-1920s"] },
+              { "q": "Which of the following cannot be listed among the characteristics of the Turkish Revolution?", "a": "It is dogmatic", "c": ["It is progressive", "It is modernizing", "It is secular"] },
+              { "q": "Which of the following can be one of the educational reforms of Atatürk?", "a": "The language revolution and The university reform", "c": ["The military reform", "The economic reform", "The political reform"] },
+              { "q": "Which action cannot be a move by Atatürk?", "a": "Exploiting religion for political gain", "c": ["Modernizing education", "Establishing secular system", "Promoting women's rights"] },
+              { "q": "Which of the following is not one of these social reforms?", "a": "The acceptance of the constitution/establishing the constitution", "c": ["Dress reform", "Surname law", "Calendar change"] },
+              { "q": "The Turkish republic took a major step on the way to secularism with ……….", "a": "The abolition of the caliphate", "c": ["The proclamation of republic", "The adoption of civil code", "The education reform"] },
+              { "q": "Which of the following can be regarded as Turkey's greatest diplomatic victory between the two World Wars?", "a": "Signing the Montreux Convention", "c": ["Joining the League of Nations", "Signing Balkan Pact", "Solving Hatay issue"] },
+              { "q": "Which of the following are not accurate for the Turkish foreign policy after the National Struggle Era?", "a": "Expansionism policy was applied", "c": ["Realistic policy was adopted", "International law was regarded as significant", "Peaceful coexistence was pursued"] },
+              { "q": "Which of the following had been a problem in Turkish-British relations in 1920s?", "a": "Mosul territories", "c": ["Cyprus issue", "Suez canal", "Palestine question"] },
+              { "q": "Which of the following had been Turkish Republic's reliable friend from the National Struggle Era to Atatürk's death?", "a": "The Soviet Union", "c": ["Great Britain", "France", "United States"] },
+              { "q": "Which of the following is not representing Turkish foreign policy manner?", "a": "Non-revisionist", "c": ["Peaceful", "Balanced", "Independent"] },
+              { "q": "What was Atatürk's main principle on pursuing the foreign policy?", "a": "Peace at home, peace in the world", "c": ["Expansion and conquest", "Isolationism", "Military alliances"] },
+              { "q": "Which of the following can not be regarded as one of the international problems solved by peaceful means in Turkish foreign policy during Atatiirk era?", "a": "Cyprus question", "c": ["Mosul issue", "Hatay problem", "Straits question"] },
+              { "q": "Which of the following agreeements are no longer valid?", "a": "League of Nations", "c": ["Montreux Convention", "Lausanne Peace Treaty", "Balkan Pact"] },
+              { "q": "What are the two groupings of states which were emerged after the great recession of 1929?", "a": "Revisionists/Anti-revisionists", "c": ["Allies/Axis", "Democracies/Dictatorships", "Capitalists/Communists"] },
+              { "q": "Which of the following can not be regarded as Atatürk's reform?", "a": "Tanzimat reforms", "c": ["Alphabet reform", "Dress reform", "Legal reforms"] },
+              { "q": "Which of the following can not be the border neighbor of Turkey?", "a": "Germany", "c": ["Greece", "Bulgaria", "Iran"] },
+              { "q": "The first and a very important political reform of Atatürk was _____.", "a": "Introducing the national will and sovereignty", "c": ["Changing the alphabet", "Abolishing caliphate", "Establishing republic"] },
+              { "q": "Which of the following is not one of these political reforms?", "a": "Changing the alphabet", "c": ["Abolition of sultanate", "Proclamation of republic", "Establishment of new constitution"] },
+              { "q": "Which of the following reform is not made on the basis of 'Sovereignty belongs unconditionally to the people'?", "a": "Unification of educational institutions", "c": ["Establishment of TGNA", "Proclamation of republic", "Adoption of constitution"] },
+              { "q": "Which of the following can not be one of the social reforms of Ataturk?", "a": "The unification of education", "c": ["The surname law", "The dress reform", "The calendar change"] },
+              { "q": "After the Turkish troops have won the victory Ataturk said 'The first phase of the National Struggle is over. Now the second phase starts'. What did he mean?", "a": "The war will end completely when the country is modernized", "c": ["Another war is about to begin", "A peace treaty should be signed before the cease fire", "The military struggle should continue"] },
+              { "q": "Which cause and effect relationships are accurate about Ataturk's reforms?", "a": "Ataturk's social reforms led to a modern state and population and Turkish revolution led to an independent state", "c": ["Economical reforms of Atatürk led to the creation of an external debt management", "Political reforms led to absolute monarchy", "Educational reforms led to religious education"] },
+              { "q": "Which one of the following is not an accurate statement about the political reforms of Ataturk?", "a": "Woman get some restrictions in the new system", "c": ["Sovereignty belongs to nation", "Republic was established", "Secular system was adopted"] },
+              { "q": "With the termination of the war of independence, the next objective of Mustafa Kemal was to ......", "a": "Create a new country", "c": ["Start another war", "Establish monarchy", "Expand territories"] },
+              { "q": "Which of the following statements are true according to the Lausanne Peace Treaty?", "a": "The independence Turkey was recognized and The capitulations were abolished", "c": ["The sultanate was abolished", "The caliphate was abolished", "Mosul was given to Turkey"] },
+              { "q": "Which of the following statements are correct about the Montreux Straits Convention?", "a": "Free movement of the passage of the warships is accepted and Turkey became the only sovereign state on the straits regime", "c": ["It changed the demilitarized status of the Turkish Straits", "International commission controlled straits", "Foreign warships had unlimited access"] },
+              { "q": "In 1930's two states provoked anxiety in Europe. Which are these states?", "a": "Italy and Germany", "c": ["France and Britain", "Soviet Union and USA", "Spain and Portugal"] },
+              { "q": "Which of the following can not be an agreement that Turkey has signed at Atatürk era?", "a": "United Nations", "c": ["Montreux Convention", "Balkan Pact", "Sadabad Pact"] },
+              { "q": "The ……… was a treaty signed by Turkey, Greece, Romania and Yugoslavia aimed at maintaining the geopolitical status quo in the region in between the two world wars.", "a": "Balkan Pact", "c": ["Montreux Convention", "Lausanne Treaty", "Sadabad Pact"] },
+              { "q": "Which of the following statements can not be regarded as one of Atatürk's attempts?", "a": "Withdrawing from the League of Nations", "c": ["Acting against the status que", "Creating Balkan Entente against the aggressive states", "Pursuing peaceful foreign policy"] },
+              { "q": "In 1937, Turkey participated to the ...... with Iran, Iraq and Afghanistan", "a": "Saadabad Pact", "c": ["Balkan Pact", "Montreux Convention", "League of Nations"] },
+              { "q": "In Turkish history, the years between are accepted as the period necessary to solve the problems that the Treaty of Lausanne left unresolved", "a": "1923-1930", "c": ["1919-1923", "1930-1938", "1923-1938"] },
+              { "q": "Turkey was in the ...... camp and chose to protect the statues quo between the two world wars.", "a": "Antirevisionist", "c": ["Revisionist", "Neutral", "Expansionist"] },
+              { "q": "Which of the following can be regarded as Turkey's greatest diplomatic victory between the two World Wars?", "a": "Solving the Mosul Question", "c": ["Joining the United Nations", "Signing Lausanne Treaty", "Establishing republic"] },
+              { "q": "Which of the following posed a problem between Turkey and France before the World War II?", "a": "The question of Hatay", "c": ["The debts of the Ottoman Empire", "The population exchange", "The straits issue"] }
+            ]
+          }
+        ];
+
+        // --- STATE ---
+        let currentQuestions = [];
+        let currentIndex = 0;
+        let score = 0;
+        let wrong = 0;
+        let isAnswerLocked = false;
+
+        // --- DOM ELEMENTS ---
+        const menuView = document.getElementById('menu-view');
+        const quizView = document.getElementById('quiz-view');
+        const resultsView = document.getElementById('results-view');
+        
+        const questionText = document.getElementById('question-text');
+        const choicesContainer = document.getElementById('choices-container');
+        const questionCounter = document.getElementById('question-counter');
+        const scoreCorrect = document.getElementById('score-correct');
+        const scoreWrong = document.getElementById('score-wrong');
+        
+        const finalCorrect = document.getElementById('final-correct');
+        const finalWrong = document.getElementById('final-wrong');
+        const finalPercentage = document.getElementById('final-percentage');
+        const progressBar = document.getElementById('progress-bar');
+        const progressContainer = document.getElementById('progress-container');
+
+        // --- FUNCTIONS ---
+
+        // 1. Helper to shuffle array (Fisher-Yates)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // 2. Start the Quiz
+        function startQuiz(categoryName) {
+            // Extract category using the method requested: 
+            // "iterate through the top-level array where each object has a 'category' property"
+            const categoryObj = rawData.find(item => item.category === categoryName);
+            
+            if (!categoryObj) {
+                alert("Error: Category not found!");
+                return;
+            }
+
+            // Clone and Shuffle questions so every play is different
+            currentQuestions = shuffleArray([...categoryObj.questions]);
+            
+            currentIndex = 0;
+            score = 0;
+            wrong = 0;
+            
+            // UI Updates
+            scoreCorrect.innerText = 0;
+            scoreWrong.innerText = 0;
+            menuView.classList.add('hidden');
+            resultsView.classList.add('hidden');
+            quizView.classList.remove('hidden');
+            progressContainer.classList.remove('hidden');
+
+            loadQuestion();
+        }
+
+        // 3. Load Question
+        function loadQuestion() {
+            if (currentIndex >= currentQuestions.length) {
+                showResults();
+                return;
+            }
+
+            isAnswerLocked = false;
+            const qData = currentQuestions[currentIndex];
+            
+            // Update progress
+            const progress = ((currentIndex) / currentQuestions.length) * 100;
+            progressBar.style.width = `${progress}%`;
+            questionCounter.innerText = `Question ${currentIndex + 1}/${currentQuestions.length}`;
+
+            // Set Question Text
+            questionText.innerText = qData.q;
+
+            // Prepare Answers
+            // Combine correct answer 'a' and wrong choices 'c'
+            let choices = [
+                { text: qData.a, isCorrect: true },
+                ...qData.c.map(wrongAns => ({ text: wrongAns, isCorrect: false }))
+            ];
+            
+            // Shuffle choices
+            choices = shuffleArray(choices);
+
+            // Render Buttons
+            choicesContainer.innerHTML = '';
+            choices.forEach(choice => {
+                const btn = document.createElement('button');
+                btn.className = "choice-btn w-full text-left p-4 rounded-xl border-2 border-gray-200 bg-white hover:border-red-300 hover:bg-gray-50 text-gray-700 font-medium text-sm md:text-base relative";
+                btn.innerText = choice.text;
+                btn.onclick = () => checkAnswer(btn, choice.isCorrect);
+                choicesContainer.appendChild(btn);
+            });
+        }
+
+        // 4. Check Answer
+        function checkAnswer(selectedBtn, isCorrect) {
+            if (isAnswerLocked) return;
+            isAnswerLocked = true;
+
+            const allBtns = choicesContainer.querySelectorAll('button');
+
+            if (isCorrect) {
+                score++;
+                scoreCorrect.innerText = score;
+                selectedBtn.classList.add('correct-anim');
+                // Add icon
+                selectedBtn.innerHTML += ` <i class="fas fa-check float-right mt-1"></i>`;
+            } else {
+                wrong++;
+                scoreWrong.innerText = wrong;
+                selectedBtn.classList.add('wrong-anim');
+                selectedBtn.innerHTML += ` <i class="fas fa-times float-right mt-1"></i>`;
+                
+                // Highlight the correct one
+                allBtns.forEach(btn => {
+                     // We have to find which button had the correct text. 
+                     // In this simple setup, we know the correct data object is in currentQuestions[currentIndex].a
+                     if(btn.innerText.includes(currentQuestions[currentIndex].a)) { 
+                         btn.classList.add('correct-anim');
+                         btn.classList.add('opacity-70'); // visual cue it was the answer
+                     }
+                });
+            }
+
+            // Wait and go next
+            setTimeout(() => {
+                currentIndex++;
+                loadQuestion();
+            }, 1500);
+        }
+
+        // 5. Show Results
+        function showResults() {
+            quizView.classList.add('hidden');
+            resultsView.classList.remove('hidden');
+            progressContainer.classList.add('hidden');
+
+            finalCorrect.innerText = score;
+            finalWrong.innerText = wrong;
+            
+            const total = score + wrong;
+            const percentage = total === 0 ? 0 : Math.round((score / total) * 100);
+            finalPercentage.innerText = `${percentage}%`;
+        }
+
+    </script>
+</body>
+</html>
