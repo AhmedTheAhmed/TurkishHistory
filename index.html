@@ -36,20 +36,31 @@
             color: white !important;
             border-color: #ef4444 !important;
         }
+        /* Disabled button style */
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4 text-gray-800">
 
     <!-- Main Container -->
-    <div class="w-full max-w-2xl bg-white rounded-2xl shadow-xl overflow-hidden min-h-[500px] flex flex-col relative">
+    <div class="w-full max-w-2xl bg-white rounded-2xl shadow-xl overflow-hidden min-h-[600px] flex flex-col relative">
         
         <!-- Header -->
-        <div class="bg-red-600 p-6 text-white text-center relative">
-            <div class="absolute top-4 left-4 opacity-20 text-4xl">
+        <div class="bg-red-600 p-6 text-white text-center relative transition-all duration-300" id="main-header">
+            <!-- Home Button (Visible in Review/Quiz modes) -->
+            <button onclick="goHome()" id="home-btn" class="hidden absolute top-6 left-6 text-white hover:text-red-200 transition-colors">
+                <i class="fas fa-home text-2xl"></i>
+            </button>
+
+            <div class="absolute top-4 right-4 opacity-20 text-4xl">
                 <i class="fas fa-landmark"></i>
             </div>
-            <h1 class="text-2xl font-bold tracking-wide">Turkish History Practice</h1>
-            <p class="text-red-100 text-sm mt-1">Midterm & Final Review</p>
+            <h1 class="text-2xl font-bold tracking-wide">Turkish History</h1>
+            <p class="text-red-100 text-sm mt-1">Practice & Review Tool</p>
             
             <!-- Progress Bar (Only visible in Quiz) -->
             <div id="progress-container" class="hidden mt-4 h-2 bg-red-800 rounded-full overflow-hidden">
@@ -58,26 +69,60 @@
         </div>
 
         <!-- Content Area -->
-        <div class="flex-grow p-6 flex flex-col justify-center relative">
+        <div class="flex-grow p-6 flex flex-col justify-center relative overflow-y-auto">
 
-            <!-- VIEW 1: Menu -->
+            <!-- VIEW 1: Main Menu (Quiz Selection) -->
             <div id="menu-view" class="fade-in space-y-6 text-center">
-                <h2 class="text-xl font-semibold text-gray-700">Select a Topic to Start</h2>
+                <div class="space-y-2">
+                    <h2 class="text-xl font-bold text-gray-800">Quiz Mode</h2>
+                    <p class="text-sm text-gray-500">Test your knowledge with multiple choice questions.</p>
+                </div>
+                
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <button onclick="startQuiz('midterm')" class="choice-btn group p-8 rounded-xl border-2 border-red-100 hover:border-red-500 bg-red-50 hover:bg-red-500 transition-colors cursor-pointer flex flex-col items-center justify-center gap-3">
+                    <button onclick="startQuiz('midterm')" class="choice-btn group p-6 rounded-xl border-2 border-red-100 hover:border-red-500 bg-red-50 hover:bg-red-500 transition-colors cursor-pointer flex flex-col items-center justify-center gap-3">
                         <i class="fas fa-book-open text-3xl text-red-500 group-hover:text-white"></i>
-                        <span class="text-lg font-bold text-red-700 group-hover:text-white">Midterm</span>
-                        <span class="text-xs text-red-400 group-hover:text-red-100">History & Origins</span>
+                        <span class="text-lg font-bold text-red-700 group-hover:text-white">Midterm Quiz</span>
                     </button>
-                    <button onclick="startQuiz('final')" class="choice-btn group p-8 rounded-xl border-2 border-red-100 hover:border-red-500 bg-red-50 hover:bg-red-500 transition-colors cursor-pointer flex flex-col items-center justify-center gap-3">
+                    <button onclick="startQuiz('final')" class="choice-btn group p-6 rounded-xl border-2 border-red-100 hover:border-red-500 bg-red-50 hover:bg-red-500 transition-colors cursor-pointer flex flex-col items-center justify-center gap-3">
                         <i class="fas fa-flag text-3xl text-red-500 group-hover:text-white"></i>
-                        <span class="text-lg font-bold text-red-700 group-hover:text-white">Final</span>
-                        <span class="text-xs text-red-400 group-hover:text-red-100">Republic Era</span>
+                        <span class="text-lg font-bold text-red-700 group-hover:text-white">Final Quiz</span>
+                    </button>
+                </div>
+
+                <div class="pt-6 border-t border-gray-100">
+                     <button onclick="showReviewMenu()" class="w-full md:w-auto px-8 py-3 bg-gray-800 text-white rounded-lg font-semibold hover:bg-gray-700 transition-colors shadow-md flex items-center justify-center mx-auto gap-2">
+                        <i class="fas fa-glasses"></i>
+                        Review Mode
                     </button>
                 </div>
             </div>
 
-            <!-- VIEW 2: Quiz -->
+            <!-- VIEW 1.5: Review Menu (Category Selection) -->
+            <div id="review-menu-view" class="hidden fade-in space-y-6 text-center">
+                <div class="space-y-2">
+                    <h2 class="text-xl font-bold text-gray-800">Review Mode</h2>
+                    <p class="text-sm text-gray-500">Study questions and answers without scoring.</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <button onclick="startReview('midterm')" class="choice-btn group p-6 rounded-xl border-2 border-blue-100 hover:border-blue-500 bg-blue-50 hover:bg-blue-500 transition-colors cursor-pointer flex flex-col items-center justify-center gap-3">
+                        <i class="fas fa-book-reader text-3xl text-blue-500 group-hover:text-white"></i>
+                        <span class="text-lg font-bold text-blue-700 group-hover:text-white">Review Midterm</span>
+                    </button>
+                    <button onclick="startReview('final')" class="choice-btn group p-6 rounded-xl border-2 border-blue-100 hover:border-blue-500 bg-blue-50 hover:bg-blue-500 transition-colors cursor-pointer flex flex-col items-center justify-center gap-3">
+                        <i class="fas fa-graduation-cap text-3xl text-blue-500 group-hover:text-white"></i>
+                        <span class="text-lg font-bold text-blue-700 group-hover:text-white">Review Final</span>
+                    </button>
+                </div>
+
+                <div class="pt-4">
+                    <button onclick="goHome()" class="text-gray-500 hover:text-gray-800 font-medium">
+                        <i class="fas fa-arrow-left mr-1"></i> Back to Home
+                    </button>
+                </div>
+            </div>
+
+            <!-- VIEW 2: Quiz Interface -->
             <div id="quiz-view" class="hidden fade-in flex-col h-full">
                 <div class="flex justify-between items-center mb-4 text-sm text-gray-500 font-medium">
                     <span id="question-counter">Question 1/20</span>
@@ -123,9 +168,39 @@
                     </div>
                 </div>
 
-                <button onclick="location.reload()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition transform hover:scale-105">
+                <button onclick="goHome()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition transform hover:scale-105">
                     <i class="fas fa-redo mr-2"></i> Back to Menu
                 </button>
+            </div>
+
+            <!-- VIEW 4: Review Interface -->
+            <div id="review-view" class="hidden fade-in flex-col h-full">
+                <div class="flex justify-between items-center mb-4 text-sm text-gray-500 font-medium">
+                    <span id="review-counter">Question 1/20</span>
+                    <span class="text-blue-600 bg-blue-50 px-2 py-1 rounded text-xs uppercase tracking-wider font-bold">Reviewing</span>
+                </div>
+
+                <div class="flex-grow flex flex-col justify-center">
+                    <h3 id="review-question-text" class="text-lg md:text-xl font-semibold text-gray-800 mb-6 leading-relaxed">
+                        <!-- Question Text -->
+                    </h3>
+
+                    <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg mb-8">
+                        <p class="text-xs text-green-600 uppercase font-bold mb-1">Correct Answer</p>
+                        <p id="review-answer-text" class="text-green-800 font-medium text-lg">
+                            <!-- Answer Text -->
+                        </p>
+                    </div>
+
+                    <div class="flex justify-between gap-4 mt-auto">
+                        <button id="review-prev-btn" onclick="prevReviewQuestion()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded-lg transition-colors">
+                            <i class="fas fa-arrow-left mr-2"></i> Back
+                        </button>
+                        <button id="review-next-btn" onclick="nextReviewQuestion()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors">
+                            Next <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
 
         </div>
@@ -138,7 +213,6 @@
 
     <script>
         // --- DATA SECTION ---
-        // Embedded JSON data as requested. In a real app with a backend, you might fetch this.
         const rawData = [
           {
             "category": "midterm",
@@ -325,27 +399,45 @@
         let score = 0;
         let wrong = 0;
         let isAnswerLocked = false;
+        
+        // Review State
+        let reviewQuestions = [];
+        let currentReviewIndex = 0;
 
         // --- DOM ELEMENTS ---
         const menuView = document.getElementById('menu-view');
+        const reviewMenuView = document.getElementById('review-menu-view');
         const quizView = document.getElementById('quiz-view');
+        const reviewView = document.getElementById('review-view');
         const resultsView = document.getElementById('results-view');
         
+        // Header Elements
+        const mainHeader = document.getElementById('main-header');
+        const homeBtn = document.getElementById('home-btn');
+        const progressContainer = document.getElementById('progress-container');
+        const progressBar = document.getElementById('progress-bar');
+
+        // Quiz Elements
         const questionText = document.getElementById('question-text');
         const choicesContainer = document.getElementById('choices-container');
         const questionCounter = document.getElementById('question-counter');
         const scoreCorrect = document.getElementById('score-correct');
         const scoreWrong = document.getElementById('score-wrong');
         
+        // Result Elements
         const finalCorrect = document.getElementById('final-correct');
         const finalWrong = document.getElementById('final-wrong');
         const finalPercentage = document.getElementById('final-percentage');
-        const progressBar = document.getElementById('progress-bar');
-        const progressContainer = document.getElementById('progress-container');
+        
+        // Review Elements
+        const reviewCounter = document.getElementById('review-counter');
+        const reviewQuestionText = document.getElementById('review-question-text');
+        const reviewAnswerText = document.getElementById('review-answer-text');
+        const reviewPrevBtn = document.getElementById('review-prev-btn');
+        const reviewNextBtn = document.getElementById('review-next-btn');
 
-        // --- FUNCTIONS ---
-
-        // 1. Helper to shuffle array (Fisher-Yates)
+        // --- COMMON FUNCTIONS ---
+        
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -354,20 +446,33 @@
             return array;
         }
 
-        // 2. Start the Quiz
-        function startQuiz(categoryName) {
-            // Extract category using the method requested: 
-            // "iterate through the top-level array where each object has a 'category' property"
-            const categoryObj = rawData.find(item => item.category === categoryName);
+        function goHome() {
+            // Reset Views
+            menuView.classList.remove('hidden');
+            reviewMenuView.classList.add('hidden');
+            quizView.classList.add('hidden');
+            reviewView.classList.add('hidden');
+            resultsView.classList.add('hidden');
             
-            if (!categoryObj) {
-                alert("Error: Category not found!");
-                return;
-            }
+            // Reset Header
+            mainHeader.classList.remove('bg-gray-900');
+            mainHeader.classList.add('bg-red-600');
+            progressContainer.classList.add('hidden');
+            homeBtn.classList.add('hidden');
+        }
 
-            // Clone and Shuffle questions so every play is different
+        function showReviewMenu() {
+            menuView.classList.add('hidden');
+            reviewMenuView.classList.remove('hidden');
+        }
+
+        // --- QUIZ LOGIC ---
+
+        function startQuiz(categoryName) {
+            const categoryObj = rawData.find(item => item.category === categoryName);
+            if (!categoryObj) { alert("Category not found!"); return; }
+
             currentQuestions = shuffleArray([...categoryObj.questions]);
-            
             currentIndex = 0;
             score = 0;
             wrong = 0;
@@ -375,15 +480,17 @@
             // UI Updates
             scoreCorrect.innerText = 0;
             scoreWrong.innerText = 0;
+            
             menuView.classList.add('hidden');
             resultsView.classList.add('hidden');
             quizView.classList.remove('hidden');
+            
             progressContainer.classList.remove('hidden');
+            homeBtn.classList.remove('hidden');
 
             loadQuestion();
         }
 
-        // 3. Load Question
         function loadQuestion() {
             if (currentIndex >= currentQuestions.length) {
                 showResults();
@@ -402,13 +509,10 @@
             questionText.innerText = qData.q;
 
             // Prepare Answers
-            // Combine correct answer 'a' and wrong choices 'c'
             let choices = [
                 { text: qData.a, isCorrect: true },
                 ...qData.c.map(wrongAns => ({ text: wrongAns, isCorrect: false }))
             ];
-            
-            // Shuffle choices
             choices = shuffleArray(choices);
 
             // Render Buttons
@@ -422,7 +526,6 @@
             });
         }
 
-        // 4. Check Answer
         function checkAnswer(selectedBtn, isCorrect) {
             if (isAnswerLocked) return;
             isAnswerLocked = true;
@@ -433,7 +536,6 @@
                 score++;
                 scoreCorrect.innerText = score;
                 selectedBtn.classList.add('correct-anim');
-                // Add icon
                 selectedBtn.innerHTML += ` <i class="fas fa-check float-right mt-1"></i>`;
             } else {
                 wrong++;
@@ -441,25 +543,20 @@
                 selectedBtn.classList.add('wrong-anim');
                 selectedBtn.innerHTML += ` <i class="fas fa-times float-right mt-1"></i>`;
                 
-                // Highlight the correct one
                 allBtns.forEach(btn => {
-                     // We have to find which button had the correct text. 
-                     // In this simple setup, we know the correct data object is in currentQuestions[currentIndex].a
                      if(btn.innerText.includes(currentQuestions[currentIndex].a)) { 
                          btn.classList.add('correct-anim');
-                         btn.classList.add('opacity-70'); // visual cue it was the answer
+                         btn.classList.add('opacity-70');
                      }
                 });
             }
 
-            // Wait and go next
             setTimeout(() => {
                 currentIndex++;
                 loadQuestion();
             }, 1500);
         }
 
-        // 5. Show Results
         function showResults() {
             quizView.classList.add('hidden');
             resultsView.classList.remove('hidden');
@@ -471,6 +568,60 @@
             const total = score + wrong;
             const percentage = total === 0 ? 0 : Math.round((score / total) * 100);
             finalPercentage.innerText = `${percentage}%`;
+        }
+
+        // --- REVIEW LOGIC ---
+
+        function startReview(categoryName) {
+            const categoryObj = rawData.find(item => item.category === categoryName);
+            if (!categoryObj) { alert("Category not found!"); return; }
+
+            // Don't shuffle for review so it's systematic, or shuffle if desired. 
+            // Let's shuffle so it's consistent with quiz behavior, but it's debatable.
+            // We'll keep it shuffled to ensure variety.
+            reviewQuestions = shuffleArray([...categoryObj.questions]);
+            currentReviewIndex = 0;
+
+            // Switch Views
+            reviewMenuView.classList.add('hidden');
+            reviewView.classList.remove('hidden');
+            homeBtn.classList.remove('hidden');
+            
+            // Change header color to distinguish mode
+            mainHeader.classList.remove('bg-red-600');
+            mainHeader.classList.add('bg-gray-900');
+
+            renderReviewQuestion();
+        }
+
+        function renderReviewQuestion() {
+            const qData = reviewQuestions[currentReviewIndex];
+            
+            reviewCounter.innerText = `Question ${currentReviewIndex + 1}/${reviewQuestions.length}`;
+            reviewQuestionText.innerText = qData.q;
+            reviewAnswerText.innerText = qData.a;
+
+            // Button States
+            reviewPrevBtn.disabled = currentReviewIndex === 0;
+            reviewNextBtn.disabled = currentReviewIndex === reviewQuestions.length - 1;
+            
+            // Visual opacity for disabled state
+            reviewPrevBtn.style.opacity = currentReviewIndex === 0 ? '0.5' : '1';
+            reviewNextBtn.style.opacity = currentReviewIndex === reviewQuestions.length - 1 ? '0.5' : '1';
+        }
+
+        function nextReviewQuestion() {
+            if (currentReviewIndex < reviewQuestions.length - 1) {
+                currentReviewIndex++;
+                renderReviewQuestion();
+            }
+        }
+
+        function prevReviewQuestion() {
+            if (currentReviewIndex > 0) {
+                currentReviewIndex--;
+                renderReviewQuestion();
+            }
         }
 
     </script>
